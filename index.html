@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Smart AR Menu</title>
+  <title>AR Menu</title>
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.min.js"></script>
   <style>
@@ -16,7 +16,7 @@
 </head>
 <body>
 
-  <!-- UI Menu -->
+  <!-- UI Dropdown -->
   <div id="ui">
     <label><strong>Select Dish:</strong></label>
     <select id="dishSelector">
@@ -28,10 +28,14 @@
 
   <!-- AR Scene -->
   <a-scene embedded arjs="sourceType: webcam;" vr-mode-ui="enabled: false" renderer="logarithmicDepthBuffer: true;">
-    <a-assets id="assets"></a-assets>
+    <a-assets>
+      <a-asset-item id="burger" src="burger.glb"></a-asset-item>
+      <a-asset-item id="pizza" src="pizza.glb"></a-asset-item>
+      <a-asset-item id="noodles" src="noodles.glb"></a-asset-item>
+    </a-assets>
 
-    <a-marker preset="hiro">
-      <a-entity id="dishModel" position="0 0 0" scale="0.5 0.5 0.5"></a-entity>
+    <a-marker preset="hiro" id="marker">
+      <!-- Dynamic model will be injected here -->
     </a-marker>
 
     <a-entity camera></a-entity>
@@ -39,26 +43,37 @@
 
   <script>
     const selector = document.getElementById('dishSelector');
-    const modelEntity = document.getElementById('dishModel');
-    const assets = document.getElementById('assets');
+    const marker = document.getElementById('marker');
 
-    selector.addEventListener('change', (e) => {
-      const modelUrl = e.target.value;
-
-      // Check if already in assets, else create
-      let asset = assets.querySelector(`[src="${modelUrl}"]`);
-      if (!asset) {
-        asset = document.createElement('a-asset-item');
-        asset.setAttribute('id', modelUrl.split('.')[0]);
-        asset.setAttribute('src', modelUrl);
-        assets.appendChild(asset);
+    function loadModel(modelId) {
+      // Remove previous model if exists
+      const oldModel = document.getElementById('currentDish');
+      if (oldModel) {
+        marker.removeChild(oldModel);
       }
 
-      modelEntity.setAttribute('gltf-model', `#${modelUrl.split('.')[0]}`);
+      // Create new model entity
+      const entity = document.createElement('a-entity');
+      entity.setAttribute('id', 'currentDish');
+      entity.setAttribute('gltf-model', `#${modelId}`);
+      entity.setAttribute('scale', '0.5 0.5 0.5');
+      entity.setAttribute('position', '0 0 0');
+
+      // Append to marker
+      marker.appendChild(entity);
+    }
+
+    // Load initial model
+    window.addEventListener('DOMContentLoaded', () => {
+      const initialValue = selector.value.split('.')[0]; // "burger"
+      loadModel(initialValue);
     });
 
-    // Trigger first load
-    selector.dispatchEvent(new Event('change'));
+    // Handle dropdown change
+    selector.addEventListener('change', (e) => {
+      const selectedModel = e.target.value.split('.')[0]; // "pizza" or "noodles"
+      loadModel(selectedModel);
+    });
   </script>
 </body>
 </html>

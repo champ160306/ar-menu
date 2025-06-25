@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Smart AR Menu</title>
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.min.js"></script>
+  <style>
+    body, html { margin: 0; overflow: hidden; font-family: sans-serif; }
+    #ui {
+      position: fixed; top: 10px; left: 50%; transform: translateX(-50%);
+      background: rgba(255,255,255,0.95); padding: 10px 20px;
+      border-radius: 10px; z-index: 20;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- UI Menu -->
+  <div id="ui">
+    <label><strong>Select Dish:</strong></label>
+    <select id="dishSelector">
+      <option value="burger.glb">🍔 Burger</option>
+      <option value="pizza.glb">🍕 Pizza</option>
+      <option value="noodles.glb">🍜 Noodles</option>
+    </select>
+  </div>
+
+  <!-- AR Scene -->
+  <a-scene embedded arjs="sourceType: webcam;" vr-mode-ui="enabled: false" renderer="logarithmicDepthBuffer: true;">
+    <a-assets id="assets"></a-assets>
+
+    <a-marker preset="hiro">
+      <a-entity id="dishModel" position="0 0 0" scale="0.5 0.5 0.5"></a-entity>
+    </a-marker>
+
+    <a-entity camera></a-entity>
+  </a-scene>
+
+  <script>
+    const selector = document.getElementById('dishSelector');
+    const modelEntity = document.getElementById('dishModel');
+    const assets = document.getElementById('assets');
+
+    selector.addEventListener('change', (e) => {
+      const modelUrl = e.target.value;
+
+      // Check if already in assets, else create
+      let asset = assets.querySelector(`[src="${modelUrl}"]`);
+      if (!asset) {
+        asset = document.createElement('a-asset-item');
+        asset.setAttribute('id', modelUrl.split('.')[0]);
+        asset.setAttribute('src', modelUrl);
+        assets.appendChild(asset);
+      }
+
+      modelEntity.setAttribute('gltf-model', `#${modelUrl.split('.')[0]}`);
+    });
+
+    // Trigger first load
+    selector.dispatchEvent(new Event('change'));
+  </script>
+</body>
+</html>

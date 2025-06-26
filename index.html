@@ -20,9 +20,9 @@
   <div id="ui">
     <label><strong>Select Dish:</strong></label>
     <select id="dishSelector">
-      <option value="burger.glb">🍔 BBurger</option>
-      <option value="pizza.glb">🍕 Pizza</option>
-      <option value="noodles.glb">🍜 Noodles</option>
+      <option value="burger">🍔 Burger</option>
+      <option value="pizza">🍕 Pizza</option>
+      <option value="noodles">🍜 Noodles</option>
     </select>
   </div>
 
@@ -46,33 +46,30 @@
     const marker = document.getElementById('marker');
 
     function loadModel(modelId) {
-      // Remove previous model if exists
+      // Remove old model
       const oldModel = document.getElementById('currentDish');
       if (oldModel) {
         marker.removeChild(oldModel);
       }
 
-      // Create new model entity
+      // Create new model
       const entity = document.createElement('a-entity');
       entity.setAttribute('id', 'currentDish');
       entity.setAttribute('gltf-model', `#${modelId}`);
       entity.setAttribute('scale', '0.5 0.5 0.5');
       entity.setAttribute('position', '0 0 0');
 
-      // Append to marker
       marker.appendChild(entity);
     }
 
-    // Load initial model
+    // Load first model on start
     window.addEventListener('DOMContentLoaded', () => {
-      const initialValue = selector.value.split('.')[0]; // "burger"
-      loadModel(initialValue);
+      loadModel(selector.value);
     });
 
-    // Handle dropdown change
+    // Load new model on change
     selector.addEventListener('change', (e) => {
-      const selectedModel = e.target.value.split('.')[0]; // "pizza" or "noodles"
-      loadModel(selectedModel);
+      loadModel(e.target.value);
     });
   </script>
 </body>

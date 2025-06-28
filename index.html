@@ -1,76 +1,559 @@
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const categoryFilter = document.getElementById('categoryFilter');
+            const filterButton = document.getElementById('filterButton');
+            const dishContainers = document.querySelectorAll('.dish-container');
+            
+            // Add event listeners
+            searchInput.addEventListener('input', filterDishes);
+            filterButton.addEventListener('click', filterDishes);
+            
+            function filterDishes() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const selectedCategory = categoryFilter.value;
+                
+                dishContainers.forEach(container => {
+                    const category = container.parentElement.getAttribute('data-category');
+                    let hasVisibleItems = false;
+                    
+                    // Show/hide based on category filter
+                    if (selectedCategory && category !== selectedCategory) {
+                        container.parentElement.style.display = 'none';
+                        return;
+                    } else {
+                        container.parentElement.style.display = 'block';
+                    }
+                    
+                    // Filter items within visible categories
+                    const dishes = container.querySelectorAll('.dish-card');
+                    dishes.forEach(dish => {
+                        const dishName = dish.querySelector('h4').textContent.toLowerCase();
+                        const dishDesc = dish.querySelector('p').textContent.toLowerCase();
+                        
+                        if (dishName.includes(searchTerm) || dishDesc.includes(searchTerm)) {
+                            dish.style.display = 'flex';
+                            hasVisibleItems = true;
+                        } else {
+                            dish.style.display = 'none';
+                        }
+                    });
+                    
+                    // Hide category header if no items visible
+                    if (!hasVisibleItems) {
+                        container.parentElement.style.display = 'none';
+                    }
+                });
+            }
+        });
+    </script>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>AR Menu</title>
-  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar.min.js"></script>
-  <style>
-    body, html { margin: 0; overflow: hidden; font-family: sans-serif; }
-    #ui {
-      position: fixed; top: 10px; left: 50%; transform: translateX(-50%);
-      background: rgba(255,255,255,0.95); padding: 10px 20px;
-      border-radius: 10px; z-index: 20;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Bistro | AR Menu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6e45e2;
+            --secondary: #88d3ce;
+            --accent: #ff7e5f;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--dark);
+            color: var(--light);
+            overflow-x: hidden;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+        
+        .dish-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+        }
+        
+        .dish-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .ar-btn {
+            background: linear-gradient(45deg, var(--accent), #ff9a5f);
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ar-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(45deg);
+            transition: all 0.3s ease;
+        }
+        
+        .ar-btn:hover::after {
+            left: 100%;
+        }
+        
+        .section-title {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 3px;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(110, 69, 226, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(110, 69, 226, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(110, 69, 226, 0);
+            }
+        }
+        
+        .floating {
+            animation: floating 6s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .grid-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            z-index: -1;
+        }
+        h1 {
+          background-image: linear-gradient(to right, white, var(--secondary)); /* Correct syntax */
+        }
+
+    </style>
 </head>
 <body>
-
-  <!-- UI Dropdown -->
-  <div id="ui">
-    <label><strong>Select Dish:</strong></label>
-    <select id="dishSelector">
-      <option value="burger">🍔 Burger</option>
-      <option value="pizza">🍕 Pizza</option>
-      <option value="noodles">🍜 Noodles</option>
-    </select>
-  </div>
-
-  <!-- AR Scene -->
-  <a-scene embedded arjs="sourceType: webcam;" vr-mode-ui="enabled: false" renderer="logarithmicDepthBuffer: true;">
-    <a-assets>
-      <a-asset-item id="burger" src="burger.glb"></a-asset-item>
-      <a-asset-item id="pizza" src="pizza.glb"></a-asset-item>
-      <a-asset-item id="noodles" src="noodles.glb"></a-asset-item>
-    </a-assets>
-
-    <a-marker preset="hiro" id="marker">
-      <!-- Dynamic model will be injected here -->
-    </a-marker>
-
-    <a-entity camera></a-entity>
-  </a-scene>
-
-  <script>
-    const selector = document.getElementById('dishSelector');
-    const marker = document.getElementById('marker');
-
-    function loadModel(modelId) {
-      // Remove old model
-      const oldModel = document.getElementById('currentDish');
-      if (oldModel) {
-        marker.removeChild(oldModel);
-      }
-
-      // Create new model
-      const entity = document.createElement('a-entity');
-      entity.setAttribute('id', 'currentDish');
-      entity.setAttribute('gltf-model', `#${modelId}`);
-      entity.setAttribute('scale', '0.5 0.5 0.5');
-      entity.setAttribute('position', '0 0 0');
-
-      marker.appendChild(entity);
-    }
-
-    // Load first model on start
-    window.addEventListener('DOMContentLoaded', () => {
-      loadModel(selector.value);
-    });
-
-    // Load new model on change
-    selector.addEventListener('change', (e) => {
-      loadModel(e.target.value);
-    });
-  </script>
-</body>
+    <div class="grid-bg"></div>
+    
+    <!-- Header -->
+    <header class="gradient-bg py-6 px-4 md:px-12 shadow-xl">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fas fa-utensils text-3xl text-white"></i>
+                <h1 class="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-var(--secondary)">
+                    NEXUS BISTRO
+                </h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <!-- <button class="px-4 py-2 rounded-full bg-white text-var(--primary) font-semibold hover:bg-opacity-90 transition">
+                    Reserve Table
+                </button> -->
+                <!-- <button class="p-2 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 transition">
+                    <i class="fas fa-bars text-white"></i>
+                </button> -->
+            </div>
+        </div>
+    </header>
+    
+    <!-- Hero Section -->
+    <section class="relative py-16 px-4 md:px-12 overflow-hidden">
+        <div class="container mx-auto flex flex-col md:flex-row items-center">
+            <div class="md:w-1/2 mb-10 md:mb-0">
+                <h2 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+                    Experience Our Menu <span class="text-var(--accent)">in AR</span>
+                </h2>
+                <p class="text-lg text-gray-300 mb-8 max-w-lg">
+                    See your dishes come to life before ordering. Our augmented reality menu lets you visualize every meal in stunning detail right at your table.
+                </p>
+                <div class="flex space-x-4">
+                    <button class="ar-btn px-6 py-3 rounded-full text-white font-bold flex items-center space-x-2">
+                        <i class="fas fa-play"></i>
+                        <span>How It Works</span>
+                    </button>
+                    <button class="px-6 py-3 rounded-full border border-var(--primary) text-white font-bold hover:bg-var(--primary) hover:bg-opacity-20 transition">
+                        View Full Menu
+                    </button>
+                </div>
+            </div>
+            <div class="md:w-1/2 flex justify-center relative">
+                <div class="relative floating">
+                    <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=500&q=80" alt="AR Preview" class="rounded-2xl w-64 h-64 object-cover shadow-2xl">
+                    <div class="absolute -top-5 -right-5 bg-var(--accent) text-white p-3 rounded-full pulse">
+                        <i class="fas fa-cube text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Bestsellers Section -->
+    <section class="py-12 px-4 md:px-12">
+        <div class="container mx-auto">
+            <h2 class="text-3xl font-bold mb-12 section-title">Bestsellers</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Dish 1 -->
+                <div class="dish-card p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold">Quantum Burger</h3>
+                        <span class="bg-var(--accent) text-white text-sm px-3 py-1 rounded-full">#1</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">Our signature beef patty with quantum cheese, served in a 5D bun with cosmic sauce.</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-var(--accent) font-bold">$14.99</span>
+                        <button class="ar-btn px-4 py-2 rounded-full text-white text-sm font-semibold flex items-center space-x-1">
+                            <i class="fas fa-cube"></i>
+                            <span>AR View</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Dish 2 -->
+                <div class="dish-card p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold">Neon Pasta</h3>
+                        <span class="bg-var(--accent) text-white text-sm px-3 py-1 rounded-full">#2</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">Glow-in-the-dark pasta with holographic parmesan and truffle-infused photon sauce.</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-var(--accent) font-bold">$16.99</span>
+                        <button class="ar-btn px-4 py-2 rounded-full text-white text-sm font-semibold flex items-center space-x-1">
+                            <i class="fas fa-cube"></i>
+                            <span>AR View</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Dish 3 -->
+                <div class="dish-card p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold">Galactic Pizza</h3>
+                        <span class="bg-var(--accent) text-white text-sm px-3 py-1 rounded-full">#3</span>
+                    </div>
+                    <p class="text-gray-400 mb-4">Black dough pizza with star-shaped pepperoni and asteroid mozzarella.</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-var(--accent) font-bold">$18.99</span>
+                        <button class="ar-btn px-4 py-2 rounded-full text-white text-sm font-semibold flex items-center space-x-1">
+                            <i class="fas fa-cube"></i>
+                            <span>AR View</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Recommended Section -->
+    <section class="py-12 px-4 md:px-12 bg-gradient-to-b from-transparent to-var(--dark)">
+        <div class="container mx-auto">
+            <h2 class="text-3xl font-bold mb-12 section-title">Chef's Recommendations</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Dish 1 -->
+                <div class="dish-card p-5 text-center">
+                    <div class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-2 border-var(--primary)">
+                        <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=200&q=80" alt="Dish" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Digital Salad</h3>
+                    <p class="text-gray-400 text-sm mb-3">Augmented greens with virtual dressing</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-var(--accent) font-bold text-sm">$12.99</span>
+                        <button class="ar-btn px-3 py-1 rounded-full text-white text-xs font-semibold flex items-center space-x-1">
+                            <i class="fas fa-cube text-xs"></i>
+                            <span>AR</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Dish 2 -->
+                <div class="dish-card p-5 text-center">
+                    <div class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-2 border-var(--primary)">
+                        <img src="https://images.unsplash.com/photo-1565958011703-44f9829ba187?auto=format&fit=crop&w=200&q=80" alt="Dish" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">AI Steak</h3>
+                    <p class="text-gray-400 text-sm mb-3">Machine learning aged ribeye</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-var(--accent) font-bold text-sm">$24.99</span>
+                        <button class="ar-btn px-3 py-1 rounded-full text-white text-xs font-semibold flex items-center space-x-1">
+                            <i class="fas fa-cube text-xs"></i>
+                            <span>AR</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Dish 3 -->
+                <div class="dish-card p-5 text-center">
+                    <div class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-2 border-var(--primary)">
+                        <img src="https://images.unsplash.com/photo-1484723091739-30a097e8f929?auto=format&fit=crop&w=200&q=80" alt="Dish" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Hologram Pancakes</h3>
+                    <p class="text-gray-400 text-sm mb-3">3D projected breakfast stack</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-var(--accent) font-bold text-sm">$10.99</span>
+                        <button class="ar-btn px-3 py-1 rounded-full text-white text-xs font-semibold flex items-center space-x-1">
+                            <i class="fas fa-cube text-xs"></i>
+                            <span>AR</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Dish 4 -->
+                <div class="dish-card p-5 text-center">
+                    <div class="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-2 border-var(--primary)">
+                        <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=200&q=80" alt="Dish" class="w-full h-full object-cover">
+                    </div>
+                    <h3 class="text-lg font-bold mb-2">Virtual Veggie Bowl</h3>
+                    <p class="text-gray-400 text-sm mb-3">Farm-to-table in the metaverse</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-var(--accent) font-bold text-sm">$14.99</span>
+                        <button class="ar-btn px-3 py-1 rounded-full text-white text-xs font-semibold flex items-center space-x-1">
+                            <i class="fas fa-cube text-xs"></i>
+                            <span>AR</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Full Menu Section -->
+    <section class="py-16 px-4 md:px-12">
+        <div class="container mx-auto">
+            <h2 class="text-3xl font-bold mb-6 section-title">Full AR Menu</h2>
+            
+            <!-- Search Filter -->
+            <div class="mb-8">
+                <div class="dish-card p-4 flex flex-col md:flex-row items-center justify-between">
+                    <div class="w-full md:w-1/2 mb-4 md:mb-0 md:mr-4">
+                        <div class="relative">
+                            <input type="text" id="searchInput" placeholder="Search dishes..." 
+                                   class="w-full bg-transparent border-b border-gray-600 py-2 px-4 text-white focus:outline-none focus:border-var(--accent) transition">
+                            <i class="fas fa-search absolute right-4 top-3 text-gray-400"></i>
+                        </div>
+                    </div>
+                    <div class="w-full md:w-1/2 flex space-x-2">
+                        <select id="categoryFilter" class="flex-1 bg-transparent border border-gray-600 rounded-full py-2 px-4 text-white focus:outline-none focus:border-var(--accent) transition">
+                            <option value="">All Categories</option>
+                            <option value="appetizers">Appetizers</option>
+                            <option value="mains">Main Courses</option>
+                            <option value="desserts">Desserts</option>
+                        </select>
+                        <button id="filterButton" class="ar-btn px-6 py-2 rounded-full text-white font-semibold">
+                            Filter
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Appetizers -->
+            <div class="mb-12" data-category="appetizers">
+                <h3 class="text-2xl font-bold mb-6 text-var(--secondary)">Appetizers</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 dish-container">
+                    <!-- Appetizer 1 -->
+                    <div class="dish-card p-5 flex items-center">
+                        <div class="w-16 h-16 rounded-lg overflow-hidden mr-4">
+                            <img src="https://images.unsplash.com/photo-1559847844-5315695dadae?auto=format&fit=crop&w=100&q=80" alt="Appetizer" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-bold">Data Chips</h4>
+                                <span class="text-var(--accent) font-bold">$8.99</span>
+                            </div>
+                            <p class="text-gray-400 text-sm">Encrypted tortilla with blockchain salsa</p>
+                        </div>
+                        <button class="ar-btn px-3 py-1 rounded-full text-white text-xs font-semibold ml-4">
+                            <i class="fas fa-cube"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Appetizer 2 -->
+                    <div class="dish-card p-5 flex items-center">
+                        <div class="w-16 h-16 rounded-lg overflow-hidden mr-4">
+                            <img src="https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=100&q=80" alt="Appetizer" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-bold">Neural Wings</h4>
+                                <span class="text-var(--accent) font-bold">$10.99</span>
+                            </div>
+                            <p class="text-gray-400 text-sm">Deep fried with AI pattern recognition sauce</p>
+                        </div>
+                        <button class="ar-btn px-3 py-1 rounded-full text-white text-xs font-semibold ml-4">
+                            <i class="fas fa-cube"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Appetizer 3 -->
+                    <div class="dish-card p-5 flex items-center">
+                        <div class="w-16 h-16 rounded-lg overflow-hidden mr-4">
+                            <img src="https://images.unsplash.com/photo-1603105037880-880cd4edfb0d?auto=format&fit=crop&w=100&q=80" alt="Appetizer" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-bold">Quantum Queso</h4>
+                                <span class="text-var(--accent) font-bold">$9.99</span>
+                            </div>
+                            <p class="text-gray-400 text-sm">Superposition cheese dip with entangled chips</p>
+                        </div>
+                        <button class="ar-btn px-3 py-1 rounded-full text-white text-xs font-semibold ml-4">
+                            <i class="fas fa-cube"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Appetizer 4 -->
+                    <div class="dish-card p-5 flex items-center">
+                        <div class="w-16 h-16 rounded-lg overflow-hidden mr-4">
+                            <img src="https://images.unsplash.com/photo-1588315029754-2dd090d553dc?auto=format&fit=crop&w=100&q=80" alt="Appetizer" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-bold">Hologram Hummus</h4>
+                                <span class="text-var(--accent) font-bold">$8.99</span>
+                            </div>
+                            <p class="text-gray-400 text-sm">Projected chickpea spread with digital pita</p>
+                        </div>
+                        <button class="ar-btn px-3 py-1 rounded-full text-white text-xs font-semibold ml-4">
+                            <i class="fas fa-cube"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Courses -->
+            <div class="mb-12" data-category="mains">
+                <h3 class="text-2xl font-bold mb-6 text-var(--secondary)">Main Courses</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 dish-container">
+                    <!-- Main 1 -->
+                    <div class="dish-card p-5 flex items-center">
+                        <div class="w-16 h-16 rounded-lg overflow-hidden mr-4">
+                            <img src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=100&q=80" alt="Main" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-bold">Binary Beef</h4>
+                                <span class="text-var(--accent) font-bold">$22.99</span>
+                            </div>
+                            <p class="text-gray-400 text-sm">010101 steak with algorithm jus</p>
+                        </div>
+                        <button class="ar-btn px-3 py-1 rounded-full text-white text-xs font-semibold ml-4">
+                            <i class="fas fa-cube"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Main 2 -->
+                    <div class="dish-card p-5 flex items-center">
+                        <div class="w-16 h-16 rounded-lg overflow-hidden mr-4">
+                            <img src="https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?auto=format&fit=crop&w=100&q=80" alt="Main" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-bold">Pixel Pasta</h4>
+                                <span class="text-var(--accent) font-bold">$18.99</span>
+                            </div>
+                            <p class="text-gray-400 text-sm">8-bit spaghetti with resolution sauce</p>
+                        </div>
+                        <button class="ar-btn px-3 py-1 rounded-full text-white text-xs font-semibold ml-4">
+                            <i class="fas fa-cube"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Main 3 -->
+                    <div class="dish-card p-5 flex items-center">
+                        <div class="w-16 h-16 rounded-lg overflow-hidden mr-4">
+                            <img src="https://images.unsplash.com/photo-1563379926898-05f4575a45d8?auto=format&fit=crop&w=100&q=80" alt="Main" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-bold">Virtual Vegan</h4>
+                                <span class="text-var(--accent) font-bold">$16.99</span>
+                            </div>
+                            <p class="text-gray-400 text-sm">Plant-based simulation with cloud garnish</p>
+                        </div>
+                        <button class="ar-btn px-3 py-1 rounded-full text-white text-xs font-semibold ml-4">
+                            <i class="fas fa-cube"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Main 4 -->
+                    <div class="dish-card p-5 flex items-center">
+                        <div class="w-16 h-16 rounded-lg overflow-hidden mr-4">
+                            <img src="https://images.unsplash.com/photo-1565299507177-b0ac66763828?auto=format&fit=crop&w=100&q=80" alt="Main" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-bold">AI Alfredo</h4>
+                                <span class="text-var(--accent) font-bold">$19.99</span>
+                            </div>
+                            <p class="text-gray-400 text-sm">Machine learning fettuccine with neural cream</p>
+                        </div>
+                        <button class="ar-btn px-3 py-1 rounded-full text-white text-xs font-semibold ml-4">
+                            <i class="fas fa-cube"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Desserts -->
+            <div data-category="desserts">
+                <h3 class="text-2xl font-bold mb-6 text-var(--secondary)">Desserts</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 dish-container">
+                    <!-- Dessert 1 -->
+                    <div class="dish-card p-5 flex items-center">
+                        <div class="w-16 h-16 rounded-lg overflow-hidden mr-4">
+                            <img src="https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?auto=format&fit=crop&w=100&q=80" alt="Dessert" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start">
+                                <h4 class="font-bold">Hologram Cheesecake</h4>
+                                <span class="text-var(--accent) font-bold">$9.99</span>
+                            </div>
+                            <p class="text-gray-400 text-sm">Projected New York style with digital berries</p>
+                        </div>
+                        <button class="ar-btn px-3 py-1 rounded-full text-white text-xs font-semibold ml-4">
+                            <i class="fas fa-cube"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Dessert 2 -->
+                    <div class="dish-card p-5 flex items-center">
+                        <div class="w-16 h-16 rounded-lg overflow-hidden mr-4">
+                            <img src="https
 </html>

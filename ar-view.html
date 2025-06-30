@@ -3,62 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR Dish Viewer</title>
-
-    <!-- A-Frame for web-based AR/VR -->
-    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-
-    <!-- Google Model Viewer for AR on Android/iOS -->
+    <title>3D Dish Viewer</title>
     <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
-
     <style>
         body {
             margin: 0;
-            background: #000;
+            background: #121212;
             color: white;
-            font-family: Arial, sans-serif;
             text-align: center;
+            font-family: Arial, sans-serif;
         }
 
-        .ar-button {
-            margin-top: 10px;
-            padding: 10px 20px;
-            background-color: #ff7e5f;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-weight: bold;
-            cursor: pointer;
+        model-viewer {
+            width: 100%;
+            height: 90vh;
         }
     </style>
 </head>
 <body>
 
-    <h2>View Your Dish in AR</h2>
+    <h2>Interactive 3D Dish Model</h2>
 
-    <!-- For Mobile AR (iOS + Android) -->
     <model-viewer 
         src="burger.glb" 
         alt="3D Model of Dish"
-        ar 
-        ar-modes="scene-viewer webxr quick-look"
         camera-controls 
         auto-rotate 
-        style="width: 100%; height: 500px;">
+        shadow-intensity="1">
     </model-viewer>
 
-    <!-- For Web VR Preview (Browser View on Desktop) -->
-    <a-scene embedded arjs>
-        <a-assets>
-            <a-asset-item id="dishModel" src="burger.glb"></a-asset-item>
-        </a-assets>
-
-        <a-entity gltf-model="#dishModel" position="0 0 0" scale="1 1 1"></a-entity>
-        <a-camera position="0 1.6 3"></a-camera>
-    </a-scene>
-
-    <br>
-    <a href="index.html" class="ar-button">Back to Menu</a>
+    <a href="index.html" style="color: #ff7e5f;">⬅️ Back to Menu</a>
 
 </body>
 </html>

@@ -56,6 +56,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        html{
+            scroll-behavior: smooth;
+        }
         :root {
             --primary: #6e45e2;
             --secondary: #88d3ce;
@@ -200,19 +203,19 @@
         <div class="container mx-auto flex flex-col md:flex-row items-center">
             <div class="md:w-1/2 mb-10 md:mb-0">
                 <h2 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                    Experience Our Menu <span class="text-var(--accent)">in AR</span>
+                    Experience Our Menu <span class="text-var(--accent)">in AR / VR</span>
                 </h2>
                 <p class="text-lg text-gray-300 mb-8 max-w-lg">
-                    See your dishes come to life before ordering. Our augmented reality menu lets you visualize every meal in stunning detail right at your table.
+                    See your dishes come to life before ordering. Our virtual reality menu lets you visualize every meal in stunning detail.
                 </p>
                 <div class="flex space-x-4">
-                    <button class="ar-btn px-6 py-3 rounded-full text-white font-bold flex items-center space-x-2">
+                    <!-- <button class="ar-btn px-6 py-3 rounded-full text-white font-bold flex items-center space-x-2">
                         <i class="fas fa-play"></i>
                         <span>How It Works</span>
-                    </button>
-                    <button class="px-6 py-3 rounded-full border border-var(--primary) text-white font-bold hover:bg-var(--primary) hover:bg-opacity-20 transition">
+                    </button> -->
+                    <a href="#full-menu"><button class="px-6 py-3 rounded-full border border-var(--primary) text-white font-bold hover:bg-var(--primary) hover:bg-opacity-20 transition">
                         View Full Menu
-                    </button>
+                    </button></a>
                 </div>
             </div>
             <div class="md:w-1/2 flex justify-center relative">
@@ -328,7 +331,7 @@
                     <p class="text-gray-400 text-sm mb-3">3D projected breakfast stack</p>
                     <div class="flex justify-between items-center">
                         <span class="text-var(--accent) font-bold text-sm">$10.99</span>
-                        <a href="ar-view.html"><button class="ar-btn px-3 py-1 rounded-full text-white text-xs font-semibold flex items-center space-x-1">
+                        <a href="vr-view.html"><button class="ar-btn px-3 py-1 rounded-full text-white text-xs font-semibold flex items-center space-x-1">
                             <i class="fas fa-cube text-xs"></i>
                             <span>AR</span>
                         </button></a>
@@ -356,6 +359,7 @@
     
     <!-- Full Menu Section -->
     <section class="py-16 px-4 md:px-12">
+        <div id="full-menu">
         <div class="container mx-auto">
             <h2 class="text-3xl font-bold mb-6 section-title">Full AR Menu</h2>
             
@@ -551,9 +555,5 @@
                             <i class="fas fa-cube"></i>
                         </button>
                     </div>
-                    
-                    <!-- Dessert 2 -->
-                    <div class="dish-card p-5 flex items-center">
-                        <div class="w-16 h-16 rounded-lg overflow-hidden mr-4">
-                            <img src="https
+        </div>            
 </html>
